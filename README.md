@@ -51,4 +51,3 @@ flutterBleBroadcast.startBroadcast().then((value) {
 flutterBleBroadcast.startBroadcast();
 
 ```
-# FlutterBleBroadcast
