@@ -1,6 +1,13 @@
 # FlutterBleBroadcast
 >In this project, it is the Flutter plugin that broadcasts BLE advertising(only Android)
 
+
+```yaml
+flutter_ble_broadcast:
+        git:
+            url: git://github.com/ahmeteminkara/FlutterBleBroadcast.git
+```
+
 ```xml
 
 <!-- Add Android permissions -->
@@ -16,7 +23,7 @@
     android:exported="true" />
 ```
 
-```c
+```dart
 
 FlutterBleBroadcast flutterBleBroadcast;
 flutterBleBroadcast = FlutterBleBroadcast(BleBroadcastBuilder(uuidDevice, uuidService, uuidCharacteristic, deviceName: "MePass"));
