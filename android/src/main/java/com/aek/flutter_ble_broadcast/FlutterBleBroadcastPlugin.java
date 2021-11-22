@@ -2,6 +2,7 @@ package com.aek.flutter_ble_broadcast;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -29,6 +30,7 @@ import com.aek.flutter_ble_broadcast.tools.ServiceSettings;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -141,13 +143,38 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                     }
 
                 } catch (Exception e) {
-                    Log.e(TAG, "start false 1 "+e.toString());
+                    Log.e(TAG, "start false 1 " + e.toString());
                     result.success(false);
                 }
 
                 break;
             case "stop":
                 stopAdvertising();
+                break;
+            case "setDateTime":
+
+                try {
+
+                    if (call.hasArgument("dt")) {
+                        String dt = call.argument("dt");
+                        if (dt == null || dt.isEmpty()) return;
+                        String[] list = dt.split("-");
+                        Calendar c = Calendar.getInstance();
+                        int y = Integer.getInteger(list[0]),
+                                m = Integer.getInteger(list[1]),
+                                d = Integer.getInteger(list[2]),
+                                hour = Integer.getInteger(list[3]),
+                                min = Integer.getInteger(list[4]),
+                                sec = Integer.getInteger(list[5]);
+                        c.set(y, m, d, hour, min, sec);
+                        AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                        am.setTime(c.getTimeInMillis());
+
+                    }
+                } catch (Exception e) {
+
+                }
+
                 break;
             default:
         }

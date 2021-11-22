@@ -29,6 +29,18 @@ class FlutterBleBroadcast {
 
   final MethodChannel _channel = const MethodChannel('flutter_ble_broadcast');
 
+  Future<bool> setDateTime(DateTime dateTime) async {
+    List<int> list = [];
+    list.add(dateTime.year);
+    list.add(dateTime.month);
+    list.add(dateTime.day);
+    list.add(dateTime.hour);
+    list.add(dateTime.minute);
+    list.add(dateTime.second);
+
+    return await _channel.invokeMethod('setDateTime', list.join("-"));
+  }
+
   Future<bool> startBroadcast() async => await _channel.invokeMethod('start', _builder.toJson);
 
   Future<bool> stopBroadcast() async => await _channel.invokeMethod('stop');
