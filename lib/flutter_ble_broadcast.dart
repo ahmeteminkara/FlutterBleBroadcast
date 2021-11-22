@@ -38,7 +38,7 @@ class FlutterBleBroadcast {
     list.add(dateTime.minute);
     list.add(dateTime.second);
 
-    return await _channel.invokeMethod('setDateTime', list.join("-"));
+    return await _channel.invokeMethod('setDateTime', {"dt": list.join("-")});
   }
 
   Future<bool> startBroadcast() async => await _channel.invokeMethod('start', _builder.toJson);

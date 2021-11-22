@@ -26,7 +26,7 @@ flutter_ble_broadcast:
 ```dart
 
 FlutterBleBroadcast flutterBleBroadcast;
-flutterBleBroadcast = FlutterBleBroadcast(BleBroadcastBuilder(uuidDevice, uuidService, uuidCharacteristic, deviceName: "MePass"));
+flutterBleBroadcast = FlutterBleBroadcast(BleBroadcastBuilder(uuidDevice, uuidService, uuidCharacteristic, deviceName: "BleDevice"));
 
 final builder = BleBroadcastBuilder(
   uuidDevice,
@@ -38,7 +38,7 @@ flutterBleBroadcast = FlutterBleBroadcast(builder);
 
 flutterBleBroadcast.bleBroadcastStatus.listen((event) {
 /*
-event
+  [event]
 • BleBroadcastStatus.BLUETOOTH_ON
 • BleBroadcastStatus.BLUETOOTH_OFF
 • BleBroadcastStatus.BROADCAST_STARTED

@@ -172,7 +172,7 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
 
                     }
                 } catch (Exception e) {
-
+Log.e(TAG,"")
                 }
 
                 break;
