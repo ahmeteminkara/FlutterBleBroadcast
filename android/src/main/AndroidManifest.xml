@@ -1,10 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.aek.flutter_ble_broadcast">
 
-
-    <permission
-        android:name="android.permission.SET_TIME"
-        android:protectionLevel="signature|system" />
+    <permission android:name="android.permission.SET_TIME" android:protectionLevel="signature|system" />
 
     <uses-permission
         android:name="android.permission.ACCESS_FINE_LOCATION"
@@ -27,7 +25,6 @@
     <uses-permission
         android:name="android.permission.BLUETOOTH_CONNECT"
         android:required="true" />
-    <uses-permission android:name="android.permission.SET_TIME" />
     <uses-permission
         android:name="com.android.vending.BILLING"
         android:required="true" />

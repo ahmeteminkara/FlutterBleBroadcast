@@ -29,14 +29,22 @@ class FlutterBleBroadcast {
 
   final MethodChannel _channel = const MethodChannel('flutter_ble_broadcast');
 
+  String _numControl(int n) {
+    if (n < 10) {
+      return "0$n";
+    } else {
+      return n.toString();
+    }
+  }
+
   Future<bool> setDateTime(DateTime dateTime) async {
-    List<int> list = [];
-    list.add(dateTime.year);
-    list.add(dateTime.month);
-    list.add(dateTime.day);
-    list.add(dateTime.hour);
-    list.add(dateTime.minute);
-    list.add(dateTime.second);
+    List<String> list = [];
+    list.add(dateTime.year.toString());
+    list.add(_numControl(dateTime.month));
+    list.add(_numControl(dateTime.day));
+    list.add(_numControl(dateTime.hour));
+    list.add(_numControl(dateTime.minute));
+    list.add(_numControl(dateTime.second));
 
     return await _channel.invokeMethod('setDateTime', {"dt": list.join("-")});
   }

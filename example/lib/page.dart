@@ -92,6 +92,15 @@ class _BlePageState extends State<BlePage> {
                       print("startBroadcast: $value");
                     })),
             ElevatedButton(child: const Text("stop"), onPressed: () => flutterBleBroadcast.stopBroadcast()),
+            /*
+            ElevatedButton(
+              child: const Text("Set Date"),
+              onPressed: () {
+                FlutterBleBroadcast flutterBleBroadcast = FlutterBleBroadcast(null);
+                flutterBleBroadcast.setDateTime(DateTime.parse("2021-11-22 12:49:07"));
+              },
+            ),
+            */
           ],
         ),
       ),

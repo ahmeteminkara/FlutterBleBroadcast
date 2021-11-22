@@ -1,6 +1,5 @@
 package com.aek.flutter_ble_broadcast;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
 import android.bluetooth.BluetoothAdapter;
@@ -15,11 +14,11 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.customview.widget.ExploreByTouchHelper;
 
@@ -27,14 +26,16 @@ import com.aek.flutter_ble_broadcast.services.BleServerService;
 import com.aek.flutter_ble_broadcast.services.FakeBleScanService;
 import com.aek.flutter_ble_broadcast.tools.ServiceSettings;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
@@ -46,7 +47,7 @@ import io.flutter.plugin.common.PluginRegistry;
 /**
  * FlutterBleBroadcastPlugin
  */
-@SuppressLint("WrongConstant")
+@SuppressLint({"WrongConstant", "SimpleDateFormat"})
 public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
 
 
@@ -110,6 +111,7 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
 
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
 
@@ -154,25 +156,32 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
             case "setDateTime":
 
                 try {
-
                     if (call.hasArgument("dt")) {
                         String dt = call.argument("dt");
                         if (dt == null || dt.isEmpty()) return;
+
                         String[] list = dt.split("-");
+                        String y = list[0],
+                                m = list[1],
+                                d = list[2],
+                                hour = list[3],
+                                min = list[4],
+                                sec = list[5];
+
+
+                        /*
                         Calendar c = Calendar.getInstance();
-                        int y = Integer.getInteger(list[0]),
-                                m = Integer.getInteger(list[1]),
-                                d = Integer.getInteger(list[2]),
-                                hour = Integer.getInteger(list[3]),
-                                min = Integer.getInteger(list[4]),
-                                sec = Integer.getInteger(list[5]);
-                        c.set(y, m, d, hour, min, sec);
+                        c.set(2013, 8, 15, 12, 34, 56);
                         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                         am.setTime(c.getTimeInMillis());
+                        */
+                        //changeSystemTime(y, m, d, hour, min, sec);
 
                     }
                 } catch (Exception e) {
-Log.e(TAG,"")
+                    Log.e(TAG, "setDateTime error: " + e.toString());
+                    //context.startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
+
                 }
 
                 break;
@@ -180,6 +189,23 @@ Log.e(TAG,"")
         }
 
     }
+
+    private void changeSystemTime(String year, String month, String day, String hour, String minute, String second) {
+        try {
+            Process process = Runtime.getRuntime().exec("date -s 20120423.130000");
+            DataOutputStream os = new DataOutputStream(process.getOutputStream());
+            String command = "date -s " + year + month + day + "." + hour + minute + second + "\n";
+            Log.e("command", command);
+            os.writeBytes(command);
+            os.flush();
+            os.writeBytes("exit\n");
+            os.flush();
+            process.waitFor();
+        } catch (InterruptedException | IOException e) {
+            Log.e(TAG, "changeSystemTime error: " + e.toString());
+        }
+    }
+
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
