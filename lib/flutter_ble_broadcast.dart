@@ -27,7 +27,7 @@ class FlutterBleBroadcast {
           status.data = json["data"];
         }
         print("datayı stream a gönderdi");
-        _bleBroadcastStatusController.add(status);
+        _bleBroadcastStatusController.sink.add(status);
       } catch (e) {
         print("FlutterBleBroadcast error: $e");
       }
