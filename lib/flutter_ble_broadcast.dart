@@ -8,15 +8,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_builder.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_status.dart';
 
+typedef BleStatusListener = void Function(BleBroadcastStatus status);
+
 class FlutterBleBroadcast {
   BleBroadcastBuilder _builder;
   StreamSubscription _subscription;
+  BleStatusListener _status;
 
-  Stream<BleBroadcastStatus> get bleBroadcastStatus => _bleBroadcastStatusController.stream;
-  final _bleBroadcastStatusController = StreamController<BleBroadcastStatus>.broadcast();
-
-  FlutterBleBroadcast({@required BleBroadcastBuilder builder}) {
+  FlutterBleBroadcast({@required BleBroadcastBuilder builder, @required BleStatusListener status}) {
     _builder = builder;
+    _status = status;
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
       print("pluginden data geldi");
       try {
@@ -27,7 +28,8 @@ class FlutterBleBroadcast {
           status.data = json["data"];
         }
         print("datayı stream a gönderdi");
-        _bleBroadcastStatusController.sink.add(status);
+
+        if (_status != null) _status(status);
       } catch (e) {
         print("FlutterBleBroadcast error: $e");
       }
