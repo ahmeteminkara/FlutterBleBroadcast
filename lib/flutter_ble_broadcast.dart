@@ -15,12 +15,10 @@ class FlutterBleBroadcast {
   Stream<BleBroadcastStatus> get bleBroadcastStatus => _bleBroadcastStatusController.stream;
   final _bleBroadcastStatusController = StreamController<BleBroadcastStatus>.broadcast();
 
-  FlutterBleBroadcast({
-    @required BleBroadcastBuilder builder,
-  }) {
+  FlutterBleBroadcast({@required BleBroadcastBuilder builder}) {
     _builder = builder;
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
-      print("FlutterBleBroadcast onBroadcastStatus: $e");
+      print("pluginden data geldi");
       try {
         Map json = jsonDecode(e);
         if (!json.containsKey("code")) return;
@@ -28,6 +26,7 @@ class FlutterBleBroadcast {
         if (json.containsKey("data")) {
           status.data = json["data"];
         }
+        print("datayı stream a gönderdi");
         _bleBroadcastStatusController.add(status);
       } catch (e) {
         print("FlutterBleBroadcast error: $e");
