@@ -30,9 +30,9 @@ class FlutterBleBroadcast {
         if (json.containsKey("data")) {
           status.data = json["data"];
         }
-        _listener(status);
+        if (_listener != null) _listener(status);
       } catch (e) {
-        print("Error: $e");
+        print("FlutterBleBroadcast error: $e");
       }
     });
   }
@@ -59,9 +59,21 @@ class FlutterBleBroadcast {
     return await _channel.invokeMethod('setDateTime', {"dt": list.join("-")});
   }
 
-  Future<bool> startBroadcast() async => await _channel.invokeMethod('start', _builder.toJson);
+  Future<bool> startBroadcast() async {
+    try {
+      return await _channel.invokeMethod('start', _builder.toJson);
+    } catch (e) {
+      return false;
+    }
+  }
 
-  Future<bool> stopBroadcast() async => await _channel.invokeMethod('stop');
+  Future<bool> stopBroadcast() async {
+    try {
+      return await _channel.invokeMethod('stop');
+    } catch (e) {
+      return false;
+    }
+  }
 
   Future<void> dispose() async {
     await stopBroadcast();
