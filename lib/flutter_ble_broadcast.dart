@@ -23,6 +23,8 @@ class FlutterBleBroadcast {
     _builder = builder;
     _listener = listener;
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
+
+      print("FlutterBleBroadcast onBroadcastStatus: $e");
       try {
         Map json = jsonDecode(e);
         if (!json.containsKey("code")) return;
