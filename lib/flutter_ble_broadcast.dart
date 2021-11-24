@@ -8,22 +8,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_builder.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_status.dart';
 
-typedef BleBroadcastListener = Function(BleBroadcastStatus bleBroadcastStatus);
-
 class FlutterBleBroadcast {
   BleBroadcastBuilder _builder;
-  BleBroadcastListener _listener;
-
   StreamSubscription _subscription;
+
+  Stream<BleBroadcastStatus> get bleBroadcastStatus => _bleBroadcastStatusController.stream;
+  final _bleBroadcastStatusController = StreamController<BleBroadcastStatus>.broadcast();
 
   FlutterBleBroadcast({
     @required BleBroadcastBuilder builder,
-    @required BleBroadcastListener listener,
   }) {
     _builder = builder;
-    _listener = listener;
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
-
       print("FlutterBleBroadcast onBroadcastStatus: $e");
       try {
         Map json = jsonDecode(e);
@@ -32,7 +28,7 @@ class FlutterBleBroadcast {
         if (json.containsKey("data")) {
           status.data = json["data"];
         }
-        if (_listener != null) _listener(status);
+        _bleBroadcastStatusController.add(status);
       } catch (e) {
         print("FlutterBleBroadcast error: $e");
       }

@@ -32,7 +32,49 @@ class _BlePageState extends State<BlePage> {
       uuidCharacteristic,
       deviceName: "DevBle",
     );
-    flutterBleBroadcast = FlutterBleBroadcast(builder: builder, listener: listener);
+    flutterBleBroadcast = FlutterBleBroadcast(builder: builder);
+
+    flutterBleBroadcast.bleBroadcastStatus.listen((BleBroadcastStatus event) {
+      String s = "";
+      switch (int.parse(event.code)) {
+        case BleBroadcastCodes.BLUETOOTH_ON:
+          s = "BLUETOOTH_ON";
+          break;
+        case BleBroadcastCodes.BLUETOOTH_OFF:
+          s = "BLUETOOTH_OFF";
+          break;
+        case BleBroadcastCodes.BROADCAST_STARTED:
+          s = "BROADCAST_STARTED";
+          break;
+        case BleBroadcastCodes.BROADCAST_START_ERROR:
+          s = "BROADCAST_START_ERROR";
+          break;
+        case BleBroadcastCodes.BROADCAST_STOPPED:
+          s = "BROADCAST_STOPPED";
+          break;
+        case BleBroadcastCodes.DEVICE_CONNECTED:
+          s = "DEVICE_CONNECTED";
+          break;
+        case BleBroadcastCodes.DEVICE_DISCONNECTED:
+          s = "DEVICE_DISCONNECTED";
+          break;
+        case BleBroadcastCodes.WRITE_CHARACTERISTIC:
+          s = "WRITE_CHARACTERISTIC -> ${event.data}";
+          break;
+        case BleBroadcastCodes.SERVICES_ADDED:
+          s = "SERVICES_ADDED";
+          break;
+        default:
+      }
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(s, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)),
+        duration: const Duration(seconds: 2),
+      ));
+
+      print("event: " + event.toString());
+    });
   }
 
   @override
@@ -63,47 +105,5 @@ class _BlePageState extends State<BlePage> {
         ),
       ),
     );
-  }
-
-  listener(BleBroadcastStatus event) {
-    String s = "";
-    switch (int.parse(event.code)) {
-      case BleBroadcastCodes.BLUETOOTH_ON:
-        s = "BLUETOOTH_ON";
-        break;
-      case BleBroadcastCodes.BLUETOOTH_OFF:
-        s = "BLUETOOTH_OFF";
-        break;
-      case BleBroadcastCodes.BROADCAST_STARTED:
-        s = "BROADCAST_STARTED";
-        break;
-      case BleBroadcastCodes.BROADCAST_START_ERROR:
-        s = "BROADCAST_START_ERROR";
-        break;
-      case BleBroadcastCodes.BROADCAST_STOPPED:
-        s = "BROADCAST_STOPPED";
-        break;
-      case BleBroadcastCodes.DEVICE_CONNECTED:
-        s = "DEVICE_CONNECTED";
-        break;
-      case BleBroadcastCodes.DEVICE_DISCONNECTED:
-        s = "DEVICE_DISCONNECTED";
-        break;
-      case BleBroadcastCodes.WRITE_CHARACTERISTIC:
-        s = "WRITE_CHARACTERISTIC -> ${event.data}";
-        break;
-      case BleBroadcastCodes.SERVICES_ADDED:
-        s = "SERVICES_ADDED";
-        break;
-      default:
-    }
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(s, style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500)),
-      duration: const Duration(seconds: 2),
-    ));
-
-    print("event: " + event.toString());
   }
 }
