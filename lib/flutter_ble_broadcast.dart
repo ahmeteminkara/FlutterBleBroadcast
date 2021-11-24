@@ -3,16 +3,26 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_builder.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_status.dart';
 
+typedef BleBroadcastListener = Function(BleBroadcastStatus bleBroadcastStatus);
+
 class FlutterBleBroadcast {
   BleBroadcastBuilder _builder;
+  BleBroadcastListener _listener;
 
-  FlutterBleBroadcast(BleBroadcastBuilder builder) {
+  StreamSubscription _subscription;
+
+  FlutterBleBroadcast({
+    @required BleBroadcastBuilder builder,
+    @required BleBroadcastListener listener,
+  }) {
     _builder = builder;
-    const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
+    _listener = listener;
+    _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
       try {
         Map json = jsonDecode(e);
         if (!json.containsKey("code")) return;
@@ -20,7 +30,7 @@ class FlutterBleBroadcast {
         if (json.containsKey("data")) {
           status.data = json["data"];
         }
-        _bleBroadcastStatusController.add(status);
+        _listener(status);
       } catch (e) {
         print("Error: $e");
       }
@@ -53,6 +63,8 @@ class FlutterBleBroadcast {
 
   Future<bool> stopBroadcast() async => await _channel.invokeMethod('stop');
 
-  Stream<BleBroadcastStatus> get bleBroadcastStatus => _bleBroadcastStatusController.stream;
-  final _bleBroadcastStatusController = StreamController<BleBroadcastStatus>.broadcast();
+  Future<void> dispose() async {
+    await stopBroadcast();
+    if (_subscription != null) _subscription.cancel();
+  }
 }

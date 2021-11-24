@@ -34,9 +34,9 @@ final builder = BleBroadcastBuilder(
   uuidCharacteristic,
   //deviceName: Default:"DevBle",
 );
-flutterBleBroadcast = FlutterBleBroadcast(builder);
+flutterBleBroadcast = FlutterBleBroadcast(builder:builder,listener: listenMethod);
 
-flutterBleBroadcast.bleBroadcastStatus.listen((event) {
+listenMethod((event) {
 /*
   [event]
 • BleBroadcastStatus.BLUETOOTH_ON
@@ -56,5 +56,7 @@ flutterBleBroadcast.startBroadcast().then((value) {
 });
 
 flutterBleBroadcast.startBroadcast();
+
+flutterBleBroadcast.dispose();
 
 ```
