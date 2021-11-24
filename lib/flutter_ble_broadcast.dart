@@ -13,7 +13,7 @@ class FlutterBleBroadcast {
   StreamSubscription _subscription;
 
   Stream<BleBroadcastStatus> get bleBroadcastStatus => _bleBroadcastStatusController.stream;
-  final _bleBroadcastStatusController = StreamController<BleBroadcastStatus>.broadcast();
+  final _bleBroadcastStatusController = StreamController<BleBroadcastStatus>();
 
   FlutterBleBroadcast({@required BleBroadcastBuilder builder}) {
     _builder = builder;
