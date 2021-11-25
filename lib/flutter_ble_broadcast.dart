@@ -11,13 +11,13 @@ import 'package:flutter_ble_broadcast/ble_broadcast_status.dart';
 typedef BleStatusListener = void Function(BleBroadcastStatus status);
 
 class FlutterBleBroadcast {
-  BleBroadcastBuilder _builder;
-  StreamSubscription _subscription;
+  static BleBroadcastBuilder _builder;
+  static StreamSubscription _subscription;
 
-  Stream<BleBroadcastStatus> get stream => _streamController.stream;
-  final _streamController = StreamController<BleBroadcastStatus>();
+  static Stream<BleBroadcastStatus> get stream => _streamController.stream;
+  static final _streamController = StreamController<BleBroadcastStatus>();
 
-  FlutterBleBroadcast({@required BleBroadcastBuilder builder, BleStatusListener listener}) {
+  static void init({@required BleBroadcastBuilder builder, BleStatusListener listener}) {
     _builder = builder;
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
       print("pluginden data geldi");
@@ -38,9 +38,9 @@ class FlutterBleBroadcast {
     });
   }
 
-  final MethodChannel _channel = const MethodChannel('flutter_ble_broadcast');
+  static const MethodChannel _channel = MethodChannel('flutter_ble_broadcast');
 
-  String _numControl(int n) {
+  static String _numControl(int n) {
     if (n < 10) {
       return "0$n";
     } else {
@@ -48,7 +48,7 @@ class FlutterBleBroadcast {
     }
   }
 
-  Future<bool> setDateTime(DateTime dateTime) async {
+  static Future<bool> setDateTime(DateTime dateTime) async {
     List<String> list = [];
     list.add(dateTime.year.toString());
     list.add(_numControl(dateTime.month));
@@ -60,7 +60,7 @@ class FlutterBleBroadcast {
     return await _channel.invokeMethod('setDateTime', {"dt": list.join("-")});
   }
 
-  Future<bool> startBroadcast() async {
+  static Future<bool> startBroadcast() async {
     try {
       return await _channel.invokeMethod('start', _builder.toJson);
     } catch (e) {
@@ -68,7 +68,7 @@ class FlutterBleBroadcast {
     }
   }
 
-  Future<bool> stopBroadcast() async {
+  static Future<bool> stopBroadcast() async {
     try {
       return await _channel.invokeMethod('stop');
     } catch (e) {
@@ -76,7 +76,7 @@ class FlutterBleBroadcast {
     }
   }
 
-  Future<void> dispose() async {
+  static Future<void> dispose() async {
     await stopBroadcast();
     if (_subscription != null) _subscription.cancel();
   }
