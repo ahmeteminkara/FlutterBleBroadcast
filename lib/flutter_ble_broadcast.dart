@@ -13,11 +13,12 @@ typedef BleStatusListener = void Function(BleBroadcastStatus status);
 class FlutterBleBroadcast {
   BleBroadcastBuilder _builder;
   StreamSubscription _subscription;
-  BleStatusListener _listener;
 
-  FlutterBleBroadcast({@required BleBroadcastBuilder builder, @required BleStatusListener listener}) {
+  Stream<BleBroadcastStatus> get stream => _streamController.stream;
+  final _streamController = StreamController<BleBroadcastStatus>();
+
+  FlutterBleBroadcast({@required BleBroadcastBuilder builder, BleStatusListener listener}) {
     _builder = builder;
-    _listener = listener;
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
       print("pluginden data geldi");
       try {
@@ -29,7 +30,8 @@ class FlutterBleBroadcast {
         }
         print("datayı stream a gönderdi");
 
-        if (_listener != null) _listener(status);
+        _streamController.add(status);
+        if (listener != null) listener(status);
       } catch (e) {
         print("FlutterBleBroadcast error: $e");
       }
