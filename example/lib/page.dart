@@ -16,8 +16,6 @@ class BlePage extends StatefulWidget {
 class _BlePageState extends State<BlePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
-  FlutterBleBroadcast flutterBleBroadcast;
-
   @override
   void initState() {
     super.initState();
@@ -32,7 +30,7 @@ class _BlePageState extends State<BlePage> {
       uuidCharacteristic,
       deviceName: "DevBle",
     );
-    flutterBleBroadcast = FlutterBleBroadcast(builder: builder, listener: (status) => listen(status));
+    FlutterBleBroadcast.init(builder: builder, listener: (status) => listen(status));
   }
 
   listen(BleBroadcastStatus event) {
@@ -88,10 +86,10 @@ class _BlePageState extends State<BlePage> {
           children: [
             ElevatedButton(
                 child: const Text("start"),
-                onPressed: () => flutterBleBroadcast.startBroadcast().then((value) {
+                onPressed: () => FlutterBleBroadcast.startBroadcast().then((value) {
                       print("startBroadcast: $value");
                     })),
-            ElevatedButton(child: const Text("stop"), onPressed: () => flutterBleBroadcast.stopBroadcast()),
+            ElevatedButton(child: const Text("stop"), onPressed: () => FlutterBleBroadcast.stopBroadcast()),
             /*
             ElevatedButton(
               child: const Text("Set Date"),
