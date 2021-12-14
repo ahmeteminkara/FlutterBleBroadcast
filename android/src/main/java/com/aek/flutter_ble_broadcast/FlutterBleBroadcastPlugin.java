@@ -26,6 +26,7 @@ import com.aek.flutter_ble_broadcast.services.BleServerService;
 import com.aek.flutter_ble_broadcast.services.FakeBleScanService;
 import com.aek.flutter_ble_broadcast.tools.ServiceSettings;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.DataOutputStream;
@@ -256,15 +257,21 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
 
     }
 
-    private void bluetoothOnOffSend(){
+    private void bluetoothOnOffSend() {
+        Log.e(TAG, "bluetoothOnOffSend run");
         BluetoothManager bluetoothManager = (BluetoothManager)
                 context.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
         BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
 
-        Map<String, String> hashMap = new HashMap<>();
-        hashMap.put("code", String.valueOf(bluetoothAdapter.isEnabled() ? BLUETOOTH_ON : BLUETOOTH_OFF));
-        if (flutterOnBroadcastStatus != null)
-            flutterOnBroadcastStatus.success(hashMap);
+        try {
+            JSONObject json = new JSONObject();
+            json.put("code", String.valueOf(bluetoothAdapter.isEnabled() ? BLUETOOTH_ON : BLUETOOTH_OFF));
+
+            if (flutterOnBroadcastStatus != null)
+                flutterOnBroadcastStatus.success(json.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private final BroadcastReceiver mBTReceiver = new BroadcastReceiver() {
