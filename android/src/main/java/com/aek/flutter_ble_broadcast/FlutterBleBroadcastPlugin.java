@@ -229,6 +229,8 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
         this.mHandler = new Handler(new FlutterHandlerCallback(this, (FlutterHandlerCallback) null));
 
 
+        bluetoothOnOffSend();
+
         context.registerReceiver(
                 new BroadcastReceiver() {
                     @Override
@@ -236,14 +238,7 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                         try {
                             int extra = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothDevice.ERROR);
                             if (extra == 10 || extra == 12) {
-                                BluetoothManager bluetoothManager = (BluetoothManager)
-                                        context.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
-                                BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
-
-                                Map<String, String> hashMap = new HashMap<>();
-                                hashMap.put("code", String.valueOf(bluetoothAdapter.isEnabled() ? BLUETOOTH_ON : BLUETOOTH_OFF));
-                                if (flutterOnBroadcastStatus != null)
-                                    flutterOnBroadcastStatus.success(hashMap);
+                                bluetoothOnOffSend();
                             }
                         } catch (Exception ignored) {
                         }
@@ -259,6 +254,17 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
         context.registerReceiver(this.mBTReceiver, new IntentFilter("android.bluetooth.adapter.action.STATE_CHANGED"));
 
 
+    }
+
+    private void bluetoothOnOffSend(){
+        BluetoothManager bluetoothManager = (BluetoothManager)
+                context.getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+
+        Map<String, String> hashMap = new HashMap<>();
+        hashMap.put("code", String.valueOf(bluetoothAdapter.isEnabled() ? BLUETOOTH_ON : BLUETOOTH_OFF));
+        if (flutterOnBroadcastStatus != null)
+            flutterOnBroadcastStatus.success(hashMap);
     }
 
     private final BroadcastReceiver mBTReceiver = new BroadcastReceiver() {
