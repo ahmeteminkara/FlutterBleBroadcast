@@ -1,7 +1,6 @@
 package com.aek.flutter_ble_broadcast;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -14,7 +13,6 @@ import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -31,11 +29,6 @@ import org.json.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.EventChannel;
@@ -152,7 +145,8 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
 
                 break;
             case "stop":
-                stopAdvertising();
+                boolean s = stopAdvertising();
+                result.success(s);
                 break;
             case "setDateTime":
 
@@ -410,10 +404,17 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
         }
     }
 
-    public void stopAdvertising() {
+    public boolean stopAdvertising() {
+        try {
+
         if (this.mBleServerService != null && this.mBleServerService.isAdvertising) {
-            this.mBleServerService.stopBleAdvertising();
+        return    this.mBleServerService.stopBleAdvertising();
         }
+
+        }catch (Exception e){
+            Log.e(TAG, "stopAdvertising error : " + e.toString());
+        }
+        return false;
     }
 
 

@@ -74,8 +74,8 @@ class FlutterBleBroadcast {
     }
   }
 
-  static Future<void> dispose() async {
-    await stopBroadcast();
+  static Future<bool> dispose() async {
     if (_subscription != null) _subscription.cancel();
+    return await stopBroadcast();
   }
 }
