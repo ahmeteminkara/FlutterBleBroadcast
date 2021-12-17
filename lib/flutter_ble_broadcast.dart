@@ -15,7 +15,7 @@ class FlutterBleBroadcast {
   static StreamSubscription _subscription;
 
   static Stream<BleBroadcastStatus> get stream => _streamController.stream;
-  static final _streamController = StreamController<BleBroadcastStatus>();
+  static final _streamController = StreamController<BleBroadcastStatus>.broadcast();
 
   static void init({@required BleBroadcastBuilder builder, BleStatusListener listener}) {
     _builder = builder;
