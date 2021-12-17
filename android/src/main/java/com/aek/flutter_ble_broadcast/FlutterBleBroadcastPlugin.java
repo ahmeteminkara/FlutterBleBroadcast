@@ -407,11 +407,14 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     public boolean stopAdvertising() {
         try {
 
-        if (this.mBleServerService != null && this.mBleServerService.isAdvertising) {
-        return    this.mBleServerService.stopBleAdvertising();
-        }
+            context.unbindService(this.mServerServiceConnection);
+            context.unbindService(this.mBleScanServiceConnection);
 
-        }catch (Exception e){
+            if (this.mBleServerService != null && this.mBleServerService.isAdvertising) {
+                return this.mBleServerService.stopBleAdvertising();
+            }
+
+        } catch (Exception e) {
             Log.e(TAG, "stopAdvertising error : " + e.toString());
         }
         return false;

@@ -1,5 +1,7 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_builder.dart';
 import 'package:flutter_ble_broadcast/ble_broadcast_codes.dart';
@@ -20,17 +22,7 @@ class _BlePageState extends State<BlePage> {
   void initState() {
     super.initState();
 
-    String uuidDevice = "d7aec172-ca69-450c-a2ba-41b156658923";
-    String uuidService = "19422237-a2cd-4630-8907-0aa767775984";
-    String uuidCharacteristic = "89f1a7ee-0c1c-4c68-8f70-8d034be60294";
-
-    final builder = BleBroadcastBuilder(
-      uuidDevice,
-      uuidService,
-      uuidCharacteristic,
-      deviceName: "DevBle",
-    );
-    FlutterBleBroadcast.init(builder: builder, listener: (status) => listen(status));
+    initBleBroadcast();
   }
 
   listen(BleBroadcastStatus event) {
@@ -89,6 +81,7 @@ class _BlePageState extends State<BlePage> {
                 onPressed: () => FlutterBleBroadcast.startBroadcast().then((value) {
                       print("startBroadcast: $value");
                     })),
+            ElevatedButton(child: const Text("restart"), onPressed: () => restart()),
             ElevatedButton(child: const Text("stop"), onPressed: () => FlutterBleBroadcast.stopBroadcast()),
             /*
             ElevatedButton(
@@ -103,5 +96,31 @@ class _BlePageState extends State<BlePage> {
         ),
       ),
     );
+  }
+
+  void restart() {
+    FlutterBleBroadcast.dispose().then((value) {
+      print("dispose then");
+      Timer(const Duration(seconds: 2), () {
+        initBleBroadcast();
+        FlutterBleBroadcast.startBroadcast().then((value) {
+          print("startBroadcast: $value");
+        });
+      });
+    });
+  }
+
+  void initBleBroadcast() {
+    String uuidDevice = "d7aec172-ca69-450c-a2ba-41b156658923";
+    String uuidService = "19422237-a2cd-4630-8907-0aa767775984";
+    String uuidCharacteristic = "89f1a7ee-0c1c-4c68-8f70-8d034be60294";
+
+    final builder = BleBroadcastBuilder(
+      uuidDevice,
+      uuidService,
+      uuidCharacteristic,
+      deviceName: "DevBle",
+    );
+    FlutterBleBroadcast.init(builder: builder, listener: (status) => listen(status));
   }
 }
