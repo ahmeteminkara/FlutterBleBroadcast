@@ -23,6 +23,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.customview.widget.ExploreByTouchHelper;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.aek.flutter_ble_broadcast.services.BleServerService;
 import com.aek.flutter_ble_broadcast.services.FakeBleScanService;
@@ -38,6 +41,7 @@ import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.embedding.engine.plugins.lifecycle.HiddenLifecycleReference;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -49,7 +53,7 @@ import io.flutter.plugin.common.PluginRegistry;
  * FlutterBleBroadcastPlugin
  */
 @SuppressLint({"WrongConstant", "SimpleDateFormat"})
-public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener, PluginRegistry.RequestPermissionsResultListener {
+public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.RequestPermissionsResultListener {
 
 
     public final static int BLUETOOTH_ON = 1000;
@@ -170,7 +174,9 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 result.success(s);
                 break;
             case "changeLauncherApp":
+                Log.e(TAG, "startActivityForResult");
                 activity.startActivityForResult(new Intent(Settings.ACTION_HOME_SETTINGS), LAUNCHER_REQUEST_CODE);
+                Log.e(TAG, "startActivityForResult after");
                 break;
 
             case "checkLauncherApp":
@@ -178,7 +184,6 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                     flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
                 break;
             case "setDateTime":
-
                 try {
                     if (call.hasArgument("dt")) {
                         String dt = call.argument("dt");
@@ -205,14 +210,13 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 } catch (Exception e) {
                     Log.e(TAG, "setDateTime error: " + e.toString());
                     //context.startActivity(new Intent(android.provider.Settings.ACTION_DATE_SETTINGS));
-
                 }
-
                 break;
             default:
         }
-
     }
+
+
 
     private void changeSystemTime(String year, String month, String day, String hour, String minute, String second) {
         try {
@@ -370,33 +374,37 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         activity = binding.getActivity();
+
+        HiddenLifecycleReference lifecycle = (HiddenLifecycleReference) binding.getLifecycle();
+        lifecycle.getLifecycle().addObserver(new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(@NonNull LifecycleOwner source, @NonNull  Lifecycle.Event event) {
+                if (event ==  Lifecycle.Event.ON_RESUME){
+                    Log.e(TAG,"ON_RESUME");
+                    if (flutterOnLaunchMode != null)
+                        flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
+                }
+            }
+        });
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
 
+        Log.e(TAG,"onDetachedFromActivityForConfigChanges");
+
+        //
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-
+        Log.e(TAG,"onReattachedToActivityForConfigChanges");
     }
 
     @Override
     public void onDetachedFromActivity() {
 
     }
-
-    @Override
-    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == LAUNCHER_REQUEST_CODE) {
-            if (flutterOnLaunchMode != null)
-                flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
-        }
-
-        return false;
-    }
-
 
     private class FlutterHandlerCallback implements Handler.Callback {
         private FlutterHandlerCallback() {

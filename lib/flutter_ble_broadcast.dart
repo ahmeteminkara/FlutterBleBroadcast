@@ -23,6 +23,7 @@ class FlutterBleBroadcast {
   static void init({@required BleBroadcastBuilder builder, BleStatusListener listener}) {
     _builder = builder;
     _subscriptionLauncher = const EventChannel("onLaunchMode").receiveBroadcastStream().listen((e) {
+      print("onLaunchMode listen: $e");
       launchMode.value = e;
     });
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
@@ -53,7 +54,7 @@ class FlutterBleBroadcast {
   }
 
   static changeLauncherApp() => _channel.invokeMethod("changeLauncherApp");
-  static  checkLauncherApp() => _channel.invokeMethod("checkLauncherApp");
+  static checkLauncherApp() => _channel.invokeMethod("checkLauncherApp");
 
   static Future<bool> setDateTime(DateTime dateTime) async {
     List<String> list = [];
