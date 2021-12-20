@@ -64,7 +64,7 @@ class _BlePageState extends State<BlePage> {
       duration: const Duration(seconds: 2),
     ));
 
-    print("event: " + event.toString());
+    print("event: $s -> " + event.toString());
   }
 
   @override
@@ -83,6 +83,13 @@ class _BlePageState extends State<BlePage> {
                     })),
             ElevatedButton(child: const Text("restart"), onPressed: () => restart()),
             ElevatedButton(child: const Text("stop"), onPressed: () => FlutterBleBroadcast.stopBroadcast()),
+            ElevatedButton(child: const Text("changeLauncherApp"), onPressed: () => FlutterBleBroadcast.changeLauncherApp()),
+            ElevatedButton(
+              child: const Text("checkLauncherApp"),
+              onPressed: () => FlutterBleBroadcast.checkLauncherApp().then((value) {
+                print("FlutterBleBroadcast.checkLauncherApp -> $value");
+              }),
+            ),
             /*
             ElevatedButton(
               child: const Text("Set Date"),

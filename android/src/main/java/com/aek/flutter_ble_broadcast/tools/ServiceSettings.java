@@ -4,8 +4,18 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattServer;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.AdvertiseSettings;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.util.Log;
+
+import com.aek.flutter_ble_broadcast.FlutterBleBroadcastPlugin;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class ServiceSettings {
@@ -20,4 +30,28 @@ public class ServiceSettings {
 
     public static int advertiseMode = AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY;
     public static int advertiseTXPowerLevel = AdvertiseSettings.ADVERTISE_TX_POWER_HIGH;
+
+
+    public static boolean isMyAppLauncherDefault(Context context) {
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
+        filter.addCategory(Intent.CATEGORY_HOME);
+
+        List<IntentFilter> filters = new ArrayList<>();
+        filters.add(filter);
+
+        final String myPackageName = context.getPackageName();
+        List<ComponentName> activities = new ArrayList<>();
+        final PackageManager packageManager = (PackageManager) context.getPackageManager();
+
+        packageManager.getPreferredActivities(filters, activities, null);
+
+        for (ComponentName activity : activities) {
+            if (myPackageName.equals(activity.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

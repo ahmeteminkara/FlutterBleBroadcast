@@ -1,6 +1,8 @@
 package com.aek.flutter_ble_broadcast;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -10,9 +12,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -30,7 +34,10 @@ import org.json.JSONObject;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -42,7 +49,7 @@ import io.flutter.plugin.common.PluginRegistry;
  * FlutterBleBroadcastPlugin
  */
 @SuppressLint({"WrongConstant", "SimpleDateFormat"})
-public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.RequestPermissionsResultListener {
+public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware,PluginRegistry.ActivityResultListener, PluginRegistry.RequestPermissionsResultListener {
 
 
     public final static int BLUETOOTH_ON = 1000;
@@ -71,8 +78,9 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     */
     public static final int SERVICE_MSG_SCAN_ON = 1234;
     public static final int SERVICE_MSG_SCAN_OFF = 1235;
+    public static final int LAUNCHER_REQUEST_CODE = 9909;
 
-    private static final String TAG = "FlutterBleBroadcastPlugin";
+    public static final String TAG = "FlutterBleBroadcastPlugin";
 
 
     /// The MethodChannel that will the communication between Flutter and native Android
@@ -81,15 +89,16 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     /// when the Flutter Engine is detached from the Activity
     private MethodChannel channel;
     private Context context = null;
+    private Activity activity = null;
 
     EventChannel.EventSink flutterOnBroadcastStatus;
+
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_ble_broadcast");
         channel.setMethodCallHandler(this);
         context = flutterPluginBinding.getApplicationContext();
-
 
         new EventChannel(flutterPluginBinding.getBinaryMessenger(), "onBroadcastStatus").setStreamHandler(new EventChannel.StreamHandler() {
             @Override
@@ -147,6 +156,13 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
             case "stop":
                 boolean s = stopAdvertising();
                 result.success(s);
+                break;
+            case "changeLauncherApp":
+                activity.startActivityForResult(new Intent(Settings.ACTION_HOME_SETTINGS), LAUNCHER_REQUEST_CODE);
+                break;
+
+            case "checkLauncherApp":
+                result.success(ServiceSettings.isMyAppLauncherDefault(context));
                 break;
             case "setDateTime":
 
@@ -332,8 +348,42 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
         }
     };
 
+
+
     @Override
     public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        return false;
+    }
+
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        activity = binding.getActivity();
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+
+    }
+
+    @Override
+    public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == LAUNCHER_REQUEST_CODE) {
+            if(resultCode == Activity.RESULT_OK){
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+            }
+        }
+
         return false;
     }
 
@@ -407,10 +457,9 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     public boolean stopAdvertising() {
         try {
 
-            context.unbindService(this.mServerServiceConnection);
-            context.unbindService(this.mBleScanServiceConnection);
 
             if (this.mBleServerService != null && this.mBleServerService.isAdvertising) {
+                context.unbindService(this.mServerServiceConnection);
                 return this.mBleServerService.stopBleAdvertising();
             }
 

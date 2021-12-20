@@ -46,6 +46,16 @@ class FlutterBleBroadcast {
     }
   }
 
+  static changeLauncherApp() => _channel.invokeMethod("changeLauncherApp");
+  static Future<bool> checkLauncherApp() async {
+    try {
+      return await _channel.invokeMethod("checkLauncherApp");
+    } catch (e) {
+      print("checkLauncherApp error: $e");
+      return false;
+    }
+  }
+
   static Future<bool> setDateTime(DateTime dateTime) async {
     List<String> list = [];
     list.add(dateTime.year.toString());
