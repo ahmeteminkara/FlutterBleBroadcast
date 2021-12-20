@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -174,9 +175,18 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 result.success(s);
                 break;
             case "changeLauncherApp":
-                Log.e(TAG, "startActivityForResult");
+                try {
+                    if (call.hasArgument("toastMessage")) {
+                        String msg = call.argument("toastMessage");
+                        if (msg != null && !msg.isEmpty()) {
+                            Toast.makeText(context, call.argument("toastMessage"), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.e(TAG, "startActivityForResult error: " + e.toString());
+                }
                 activity.startActivityForResult(new Intent(Settings.ACTION_HOME_SETTINGS), LAUNCHER_REQUEST_CODE);
-                Log.e(TAG, "startActivityForResult after");
+
                 break;
 
             case "checkLauncherApp":
@@ -215,7 +225,6 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
             default:
         }
     }
-
 
 
     private void changeSystemTime(String year, String month, String day, String hour, String minute, String second) {
@@ -378,9 +387,9 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
         HiddenLifecycleReference lifecycle = (HiddenLifecycleReference) binding.getLifecycle();
         lifecycle.getLifecycle().addObserver(new LifecycleEventObserver() {
             @Override
-            public void onStateChanged(@NonNull LifecycleOwner source, @NonNull  Lifecycle.Event event) {
-                if (event ==  Lifecycle.Event.ON_RESUME){
-                    Log.e(TAG,"ON_RESUME");
+            public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    Log.e(TAG, "ON_RESUME");
                     if (flutterOnLaunchMode != null)
                         flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
                 }
@@ -391,14 +400,14 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     @Override
     public void onDetachedFromActivityForConfigChanges() {
 
-        Log.e(TAG,"onDetachedFromActivityForConfigChanges");
+        Log.e(TAG, "onDetachedFromActivityForConfigChanges");
 
         //
     }
 
     @Override
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
-        Log.e(TAG,"onReattachedToActivityForConfigChanges");
+        Log.e(TAG, "onReattachedToActivityForConfigChanges");
     }
 
     @Override

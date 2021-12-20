@@ -53,7 +53,7 @@ class FlutterBleBroadcast {
     }
   }
 
-  static changeLauncherApp() => _channel.invokeMethod("changeLauncherApp");
+  static changeLauncherApp({String toastMessage = ""}) => _channel.invokeMethod("changeLauncherApp", {"toastMessage": toastMessage});
   static checkLauncherApp() => _channel.invokeMethod("checkLauncherApp");
 
   static Future<bool> setDateTime(DateTime dateTime) async {
