@@ -49,7 +49,7 @@ import io.flutter.plugin.common.PluginRegistry;
  * FlutterBleBroadcastPlugin
  */
 @SuppressLint({"WrongConstant", "SimpleDateFormat"})
-public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware,PluginRegistry.ActivityResultListener, PluginRegistry.RequestPermissionsResultListener {
+public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware, PluginRegistry.ActivityResultListener, PluginRegistry.RequestPermissionsResultListener {
 
 
     public final static int BLUETOOTH_ON = 1000;
@@ -92,6 +92,7 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     private Activity activity = null;
 
     EventChannel.EventSink flutterOnBroadcastStatus;
+    EventChannel.EventSink flutterOnLaunchMode;
 
 
     @Override
@@ -109,6 +110,17 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
             @Override
             public void onCancel(Object arguments) {
                 flutterOnBroadcastStatus = null;
+            }
+        });
+        new EventChannel(flutterPluginBinding.getBinaryMessenger(), "onLaunchMode").setStreamHandler(new EventChannel.StreamHandler() {
+            @Override
+            public void onListen(Object arguments, EventChannel.EventSink events) {
+                flutterOnLaunchMode = events;
+            }
+
+            @Override
+            public void onCancel(Object arguments) {
+                flutterOnLaunchMode = null;
             }
         });
 
@@ -162,7 +174,8 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 break;
 
             case "checkLauncherApp":
-                result.success(ServiceSettings.isMyAppLauncherDefault(context));
+                if (flutterOnLaunchMode != null)
+                    flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
                 break;
             case "setDateTime":
 
@@ -349,7 +362,6 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     };
 
 
-
     @Override
     public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         return false;
@@ -378,10 +390,8 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == LAUNCHER_REQUEST_CODE) {
-            if(resultCode == Activity.RESULT_OK){
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-            }
+            if (flutterOnLaunchMode != null)
+                flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
         }
 
         return false;

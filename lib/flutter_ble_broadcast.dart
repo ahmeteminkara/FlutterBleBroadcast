@@ -13,12 +13,18 @@ typedef BleStatusListener = void Function(BleBroadcastStatus status);
 class FlutterBleBroadcast {
   static BleBroadcastBuilder _builder;
   static StreamSubscription _subscription;
+  static StreamSubscription _subscriptionLauncher;
 
   static Stream<BleBroadcastStatus> get stream => _streamController.stream;
   static final _streamController = StreamController<BleBroadcastStatus>.broadcast();
 
+  static ValueNotifier<bool> launchMode = ValueNotifier(null);
+
   static void init({@required BleBroadcastBuilder builder, BleStatusListener listener}) {
     _builder = builder;
+    _subscriptionLauncher = const EventChannel("onLaunchMode").receiveBroadcastStream().listen((e) {
+      launchMode.value = e;
+    });
     _subscription = const EventChannel("onBroadcastStatus").receiveBroadcastStream().listen((e) {
       print("FlutterBleBroadcast listen: $e");
       try {
@@ -47,14 +53,7 @@ class FlutterBleBroadcast {
   }
 
   static changeLauncherApp() => _channel.invokeMethod("changeLauncherApp");
-  static Future<bool> checkLauncherApp() async {
-    try {
-      return await _channel.invokeMethod("checkLauncherApp");
-    } catch (e) {
-      print("checkLauncherApp error: $e");
-      return false;
-    }
-  }
+  static  checkLauncherApp() => _channel.invokeMethod("checkLauncherApp");
 
   static Future<bool> setDateTime(DateTime dateTime) async {
     List<String> list = [];
@@ -86,6 +85,7 @@ class FlutterBleBroadcast {
 
   static Future<bool> dispose() async {
     if (_subscription != null) _subscription.cancel();
+    if (_subscriptionLauncher != null) _subscriptionLauncher.cancel();
     return await stopBroadcast();
   }
 }
