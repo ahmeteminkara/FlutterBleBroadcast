@@ -83,22 +83,21 @@ class _BlePageState extends State<BlePage> {
                     })),
             ElevatedButton(child: const Text("restart"), onPressed: () => restart()),
             ElevatedButton(child: const Text("stop"), onPressed: () => FlutterBleBroadcast.stopBroadcast()),
-            ElevatedButton(child: const Text("changeLauncherApp"), onPressed: () => FlutterBleBroadcast.changeLauncherApp(toastMessage: "Test message")),
+            ElevatedButton(
+                child: const Text("changeLauncherApp"),
+                onPressed: () => FlutterBleBroadcast.changeLauncherApp(toastMessage: "Test message")),
             ElevatedButton(
               child: const Text("checkLauncherApp"),
               onPressed: () => FlutterBleBroadcast.checkLauncherApp().then((value) {
                 print("FlutterBleBroadcast.checkLauncherApp -> $value");
               }),
             ),
-            /*
             ElevatedButton(
               child: const Text("Set Date"),
               onPressed: () {
-                FlutterBleBroadcast flutterBleBroadcast = FlutterBleBroadcast(null);
-                flutterBleBroadcast.setDateTime(DateTime.parse("2021-11-22 12:49:07"));
+                FlutterBleBroadcast.setDateTime(DateTime.parse("2021-11-22 12:49:07"));
               },
             ),
-            */
           ],
         ),
       ),

@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,6 +38,10 @@ import org.json.JSONObject;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -208,13 +213,14 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                                 sec = list[5];
 
 
+
                         /*
                         Calendar c = Calendar.getInstance();
                         c.set(2013, 8, 15, 12, 34, 56);
                         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                         am.setTime(c.getTimeInMillis());
                         */
-                        //changeSystemTime(y, m, d, hour, min, sec);
+                        changeSystemTime(y, m, d, hour, min, sec);
 
                     }
                 } catch (Exception e) {
@@ -229,16 +235,19 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
 
     private void changeSystemTime(String year, String month, String day, String hour, String minute, String second) {
         try {
-            Process process = Runtime.getRuntime().exec("date -s 20120423.130000");
-            DataOutputStream os = new DataOutputStream(process.getOutputStream());
-            String command = "date -s " + year + month + day + "." + hour + minute + second + "\n";
-            Log.e("command", command);
-            os.writeBytes(command);
-            os.flush();
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-        } catch (InterruptedException | IOException e) {
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            String value = String.format("%s-%s-%s %s:%s:%s", year, month, day, hour, minute, second);
+            Date date = dateFormat.parse(value);
+
+            boolean itsWork = false;
+            if (date != null) {
+                itsWork = SystemClock.setCurrentTimeMillis(date.getTime());
+            }
+            Log.e(TAG, "itsWork: " + itsWork);
+
+
+        } catch (Exception e) {
             Log.e(TAG, "changeSystemTime error: " + e.toString());
         }
     }
@@ -344,7 +353,7 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 new Handler().postDelayed(FlutterBleBroadcastPlugin.this::startAdvertising, 1000);
 
             } else {
-                toast("Unable to service");
+                toast("Unable to service. Code: " + r_init);
             }
         }
 

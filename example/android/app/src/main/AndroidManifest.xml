@@ -2,7 +2,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.aek.flutter_ble_broadcast_example">
 
-    <permission android:name="android.permission.SET_TIME" android:protectionLevel="signature|system" />
+    <permission
+        android:name="android.permission.SET_TIME"
+        android:label="@string/app_name"
+        android:protectionLevel="signature|system" />
+
+    <uses-permission
+        android:name="android.permission.SET_TIME_ZONE"
+        android:protectionLevel="signature|system"
+        tools:ignore="ProtectedPermissions" />
 
 
     <uses-permission
@@ -35,7 +43,7 @@
 
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="flutter_ble_broadcast_example">
+        android:label="@string/app_name">
         <activity
             android:name=".MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
@@ -59,8 +67,9 @@
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
                 android:resource="@drawable/launch_background" />
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.HOME" />
             </intent-filter>
@@ -81,7 +90,6 @@
             android:name="com.aek.flutter_ble_broadcast.services.FakeBleScanService"
             android:enabled="true"
             android:exported="true" />
-
 
 
     </application>
