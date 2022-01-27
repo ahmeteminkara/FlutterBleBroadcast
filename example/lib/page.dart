@@ -128,5 +128,9 @@ class _BlePageState extends State<BlePage> {
       deviceName: "DevBle",
     );
     FlutterBleBroadcast.init(builder: builder, listener: (status) => listen(status));
+
+    FlutterBleBroadcast.startBroadcast().then((value) {
+      print("startBroadcast: $value");
+    });
   }
 }
