@@ -212,10 +212,10 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 try{
                     process = Runtime.getRuntime().exec("su");
                     result.success(true);
-                    return;
+
                 } catch (Exception e) {
                     result.success(false);
-                    return;
+
                 } finally{
                     if(process != null){
                         try{
