@@ -232,8 +232,10 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 try {
                     procDis = Runtime.getRuntime().exec(new String[]{"su","-c","service call activity 42 s16 com.android.systemui"});
                     procDis.waitFor();
+                    toast("Sistem arayüzü devre dışı bırakıldı");
                 } catch (Exception e) {
                     Log.e(TAG, "disableSystemUI error: " + e.toString());
+                    toast("Sistem arayüzü pasif etme hatalı");
                 } finally{
                     if(procDis != null){
                         try{
@@ -250,8 +252,10 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 try {
                     procEnable = Runtime.getRuntime().exec(new String[]{"su","-c","am startservice -n com.android.systemui/.SystemUIService"});
                     procEnable.waitFor();
+                    toast("Sistem arayüzü aktifleştirildi");
                 } catch (Exception e) {
                     Log.e(TAG, "enableSystemUI error: " + e.toString());
+                    toast("Sistem arayüzü aktif etme hatalı");
                 } finally{
                     if(procEnable != null){
                         try{
