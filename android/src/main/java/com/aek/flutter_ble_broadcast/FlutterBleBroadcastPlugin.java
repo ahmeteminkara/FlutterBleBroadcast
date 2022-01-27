@@ -220,6 +220,7 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                     if(process != null){
                         try{
                             process.destroy();
+                            process = null;
                         }catch (Exception e) {
                         }
                     }
@@ -245,20 +246,21 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 break;
 
             case "enableSystemUI":
+                Process procEnable = null;
                 try {
-                    proc = Runtime.getRuntime().exec(new String[]{"su","-c","am startservice -n com.android.systemui/.SystemUIService"});
-                    proc.waitFor();
+                    procEnable = Runtime.getRuntime().exec(new String[]{"su","-c","am startservice -n com.android.systemui/.SystemUIService"});
+                    procEnable.waitFor();
                 } catch (Exception e) {
                     Log.e(TAG, "enableSystemUI error: " + e.toString());
                 } finally{
-                    if(proc != null){
+                    if(procEnable != null){
                         try{
-                            proc.destroy();
+                            procEnable.destroy();
                         }catch (Exception e) {
                         }
                     }
                 }
-                proc = null;
+                procEnable = null;
                 
                 break;
 
