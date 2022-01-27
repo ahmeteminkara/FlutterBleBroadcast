@@ -56,6 +56,7 @@ class FlutterBleBroadcast {
   static changeLauncherApp({String toastMessage = ""}) => _channel.invokeMethod("changeLauncherApp", {"toastMessage": toastMessage});
   static checkLauncherApp() => _channel.invokeMethod("checkLauncherApp");
   
+  static Future<bool> checkRoot() => _channel.invokeMethod("checkRoot");
   static disableSystemUI() => _channel.invokeMethod("disableSystemUI");
   static enableSystemUI() => _channel.invokeMethod("enableSystemUI");
 

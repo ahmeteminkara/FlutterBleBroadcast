@@ -207,15 +207,41 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                     flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
                 break;
 
+            case "checkRoot":
+                Process process = null;            
+                try{
+                    process = Runtime.getRuntime().exec("su");
+                    result.success(true);
+                    return;
+                } catch (Exception e) {
+                    result.success(false);
+                    return;
+                } finally{
+                    if(process != null){
+                        try{
+                            process.destroy();
+                        }catch (Exception e) {
+                        }
+                    }
+                }
+                break;
+
             case "disableSystemUI":
-                Process proc = null;
+                Process procDis = null;
                 try {
-                    proc = Runtime.getRuntime().exec(new String[]{"su","-c","service call activity 42 s16 com.android.systemui"});
-                    proc.waitFor();
+                    procDis = Runtime.getRuntime().exec(new String[]{"su","-c","service call activity 42 s16 com.android.systemui"});
+                    procDis.waitFor();
                 } catch (Exception e) {
                     Log.e(TAG, "disableSystemUI error: " + e.toString());
+                } finally{
+                    if(procDis != null){
+                        try{
+                            procDis.destroy();
+                        }catch (Exception e) {
+                        }
+                    }
                 }
-                proc = null;
+                procDis = null;
                 break;
 
             case "enableSystemUI":
@@ -224,6 +250,13 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                     proc.waitFor();
                 } catch (Exception e) {
                     Log.e(TAG, "enableSystemUI error: " + e.toString());
+                } finally{
+                    if(proc != null){
+                        try{
+                            proc.destroy();
+                        }catch (Exception e) {
+                        }
+                    }
                 }
                 proc = null;
                 
