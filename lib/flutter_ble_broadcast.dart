@@ -55,6 +55,9 @@ class FlutterBleBroadcast {
 
   static changeLauncherApp({String toastMessage = ""}) => _channel.invokeMethod("changeLauncherApp", {"toastMessage": toastMessage});
   static checkLauncherApp() => _channel.invokeMethod("checkLauncherApp");
+  
+  static disableSystemUI() => _channel.invokeMethod("disableSystemUI");
+  static enableSystemUI() => _channel.invokeMethod("enableSystemUI");
 
   static Future<bool> setDateTime(DateTime dateTime) async {
     List<String> list = [];

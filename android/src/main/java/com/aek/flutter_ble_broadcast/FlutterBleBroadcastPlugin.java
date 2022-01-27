@@ -154,6 +154,14 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                         ServiceSettings.deviceName = call.argument("deviceName");
 
                         if (checkLocationPermission()) {
+
+                            if(BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser() == null){
+                                Log.e(TAG, "BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser() is null !!!! ");
+                            }else{
+                                Log.e(TAG, "BluetoothAdapter.getDefaultAdapter().getBluetoothLeAdvertiser() is not null ");
+                            }
+
+
                             methodInit();
                             startAdvertising();
                             result.success(true);
@@ -198,6 +206,29 @@ public class FlutterBleBroadcastPlugin implements FlutterPlugin, MethodCallHandl
                 if (flutterOnLaunchMode != null)
                     flutterOnLaunchMode.success(ServiceSettings.isMyAppLauncherDefault(context));
                 break;
+
+            case "disableSystemUI":
+                Process proc = null;
+                try {
+                    proc = Runtime.getRuntime().exec(new String[]{"su","-c","service call activity 42 s16 com.android.systemui"});
+                    proc.waitFor();
+                } catch (Exception e) {
+                    Log.e(TAG, "disableSystemUI error: " + e.toString());
+                }
+                proc = null;
+                break;
+
+            case "enableSystemUI":
+                try {
+                    proc = Runtime.getRuntime().exec(new String[]{"su","-c","am startservice -n com.android.systemui/.SystemUIService"});
+                    proc.waitFor();
+                } catch (Exception e) {
+                    Log.e(TAG, "enableSystemUI error: " + e.toString());
+                }
+                proc = null;
+                
+                break;
+
             case "setDateTime":
                 try {
                     if (call.hasArgument("dt")) {

@@ -13,6 +13,7 @@ import android.bluetooth.le.AdvertiseCallback;
 import android.bluetooth.le.AdvertiseData;
 import android.bluetooth.le.AdvertiseSettings;
 import android.bluetooth.le.BluetoothLeAdvertiser;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Handler;
@@ -150,7 +151,8 @@ public class BleServerService extends Service {
 
     public int initialize() {
         if (this.mBluetoothManager == null) {
-            this.mBluetoothManager = (BluetoothManager) getSystemService("bluetooth");
+            this.mBluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
+
             if (this.mBluetoothManager == null) {
                 return -1;
             }
@@ -166,7 +168,6 @@ public class BleServerService extends Service {
         if (this.mBTAdvertiser == null) {
             return -4;
         }
-
         getGattServer();
         updateServerServices();
         //BleServerService.this.serverHandler.obtainMessage(FlutterBleBroadcastPlugin.SERVICE_MSG_UPDATE_DEVICE_NAME).sendToTarget();
@@ -265,7 +266,6 @@ public class BleServerService extends Service {
 
     public void disconnectDevice(BluetoothDevice b_dev) {
         this.mGattServer.cancelConnection(b_dev);
-        //ServiceSettings.removeDeviceFromNotiList(b_dev);
     }
 
     /* access modifiers changed from: private
